@@ -14,7 +14,7 @@ public interface BaseExceptionAdvice {
             Exception e,
             HttpStatus status,
             String error,
-            Map<String, String> details
+            Object details
     ) {
         Map<String, Object> body = new LinkedHashMap<>();
 
