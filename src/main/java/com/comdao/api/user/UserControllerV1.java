@@ -62,7 +62,8 @@ public class UserControllerV1 {
     public ResponseEntity<Void> updatePassword(
             @Valid @RequestBody UserPasswordUpdateDto update,
             @AuthenticationPrincipal/*@RequestParam(name = "id")*/ Long id
-    ) throws PasswordPolicyViolationException, UserDisabledException, UserNotExistException {
+    ) throws PasswordPolicyViolationException, UserDisabledException,
+            UserNotExistException, PasswordUpdateViolationException {
         userService.updatePassword(id, update);
         return new ResponseEntity<>(HttpStatus.OK);
     }

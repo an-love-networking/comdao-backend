@@ -142,7 +142,7 @@ public class UserService {
             throw new UserDisabledException("User is disabled already");
         }
 
-        if (!user.getPassword().equals(passwordEncoder.encode(passwordUpdate.getOldPassword())))
+        if (!passwordEncoder.matches(passwordUpdate.getOldPassword(), user.getPassword()))
             throw new PasswordUpdateViolationException("Old password incorrect");
 
         if (user.getLastChangePassword() != null &&
