@@ -5,7 +5,7 @@ import com.comdao.api.base.RFCException;
 import java.util.Map;
 
 public class CategoryNotExistException extends RFCException {
-    public CategoryNotExistException(String message, Map<String, String> details) {
+    public CategoryNotExistException(String message, Map<String, Object> details) {
         super(message, details);
     }
 

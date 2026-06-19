@@ -1,6 +1,5 @@
 package com.comdao.api.category.dto;
 
-import com.comdao.api.product.entities.Product;
 import com.comdao.api.product.entities.enums.Badge;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,5 +22,7 @@ public class CategoryUpdateDto {
     private String description;
     private Badge badge;
     @Size(min = 1, message = "Category must have at least 1 product")
-    private Set<Product> products;
+    private Set<Long> productIds;
+    @NotNull
+    private Boolean retrievable;
 }

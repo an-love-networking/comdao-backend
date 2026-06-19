@@ -3,6 +3,7 @@ package com.comdao.api.user.entities;
 import com.comdao.api.user.entities.enums.Role;
 import com.comdao.api.user.entities.enums.Tier;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +31,8 @@ import java.util.List;
 @NoArgsConstructor
 public class User implements UserDetails {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
+    @SequenceGenerator(name = "user_seq_gen", allocationSize = 1, sequenceName = "user_seq")
     private Long id;
 
     private String username;
@@ -50,6 +52,18 @@ public class User implements UserDetails {
     private Role role = Role.USER;
     private Boolean isActive = true;
     private LocalDateTime lastChangePassword;
+
+    @JsonIgnore
+    private String activeJwtToken;
+
+    private Double rewardPoint = 0.0;
+    @JsonIgnore
+    @Version
+    private Long version;
+
+    public void addRewardPoint(Double rewardPoint) {
+        this.rewardPoint += rewardPoint;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -12,6 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CategoryResponseDto {
+    private Long id;
     private String label;
     private String description;
     private Badge badge;

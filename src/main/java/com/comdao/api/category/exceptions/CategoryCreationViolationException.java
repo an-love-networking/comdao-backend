@@ -5,7 +5,7 @@ import com.comdao.api.base.RFCException;
 import java.util.Map;
 
 public class CategoryCreationViolationException extends RFCException {
-    public CategoryCreationViolationException(String message, Map<String, String> details) {
+    public CategoryCreationViolationException(String message, Map<String, Object> details) {
         super(message, details);
     }
 

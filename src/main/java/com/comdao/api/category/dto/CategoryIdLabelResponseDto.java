@@ -4,4 +4,6 @@ public @interface CategoryIdLabelResponseDto {
     long getId();
 
     String getLabel();
+
+    String getDescription();
 }

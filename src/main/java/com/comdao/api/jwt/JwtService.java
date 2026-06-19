@@ -1,10 +1,14 @@
 package com.comdao.api.jwt;
 
+import com.comdao.api.user.UserChecker;
 import com.comdao.api.user.entities.User;
+import com.comdao.api.user.exceptions.UserDisabledException;
+import com.comdao.api.user.exceptions.UserNotFoundException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,18 +19,25 @@ import java.util.Date;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
+    private final UserChecker userChecker;
+
     @Value("${app.jwt.secret-key}")
     String secretKey;
     @Value("${app.jwt.expire-duration-minutes}")
     Long expireDurationInMinutes;
 
-    public Boolean isValid(String token, User user) {
-        Date expiration = extractClaims(token).getExpiration();
-        if (!user.getIsActive() && expiration.before(new Date())) {
-            return false;
+    public Boolean isValid(String token)
+            throws UserNotFoundException, UserDisabledException {
+        User user = userChecker.checkExistAndActiveByUsername(getSubject(token));
+        try {
+            extractClaims(user.getActiveJwtToken());
+        } catch (Exception e) {
+            user.setActiveJwtToken(null);
         }
-        return true;
+
+        return (user.getActiveJwtToken() == null || user.getActiveJwtToken().equals(token)) && user.getIsActive();
     }
 
     public String generateToken(String subject) {

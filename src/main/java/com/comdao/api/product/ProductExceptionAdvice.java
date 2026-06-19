@@ -3,6 +3,7 @@ package com.comdao.api.product;
 import com.comdao.api.base.BaseExceptionAdvice;
 import com.comdao.api.product.exceptions.ProductDuplicationCreationException;
 import com.comdao.api.product.exceptions.ProductNotExistException;
+import com.comdao.api.product.exceptions.ProductNotRetrievableException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,4 +26,9 @@ public class ProductExceptionAdvice implements BaseExceptionAdvice {
         return buildErrorResponse(request, e, HttpStatus.BAD_REQUEST, "Product not found", null);
     }
 
+    @ExceptionHandler(ProductNotRetrievableException.class)
+    public ResponseEntity<Map<String, Object>> handleProductNotRetrievable(HttpServletRequest request,
+                                                                           ProductNotRetrievableException e) {
+        return buildErrorResponse(request, e, HttpStatus.BAD_REQUEST, "Product not available at the moment", null);
+    }
 }

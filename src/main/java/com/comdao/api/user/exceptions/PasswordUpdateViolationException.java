@@ -5,7 +5,7 @@ import com.comdao.api.base.RFCException;
 import java.util.Map;
 
 public class PasswordUpdateViolationException extends RFCException {
-    public PasswordUpdateViolationException(String message, Map<String, String> details) {
+    public PasswordUpdateViolationException(String message, Map<String, Object> details) {
         super(message, details);
     }
 

@@ -42,4 +42,25 @@ public class GlobalExceptionAdvice implements BaseExceptionAdvice {
     public ResponseEntity<Map<String, Object>> handleInvalidFormat(HttpServletRequest request, InvalidFormatException e) {
         return buildErrorResponse(request, e, HttpStatus.BAD_REQUEST, "Bad Request", null);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgs(HttpServletRequest request, IllegalArgumentException e) {
+        e.printStackTrace();
+        return buildErrorResponse(request, e, HttpStatus.BAD_REQUEST, "Illegal arguments", null);
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalState(HttpServletRequest request, IllegalStateException e) {
+        return buildErrorResponse(request, e, HttpStatus.BAD_REQUEST, "Illegal arguments", null);
+    }
+
+//    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+//    public ResponseEntity<Map<String, Object>> handlePreAuthFailure(HttpServletRequest request, org.springframework.security.access.AccessDeniedException e) {
+//        return buildErrorResponse(request, e, HttpStatus.UNAUTHORIZED, "Access denied", null);
+//    }
+
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<Map<String, Object>> handleGeneral(HttpServletRequest request, Exception e) {
+//        return buildErrorResponse(request, e, HttpStatus.BAD_REQUEST, "Error", null);
+//    }
 }

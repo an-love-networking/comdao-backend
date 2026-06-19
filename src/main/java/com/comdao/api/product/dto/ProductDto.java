@@ -9,10 +9,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDto {
+    private Long id;
     private String label;
     private String description;
     private Double price;
     private String currency;
     private Badge badge;
     private String unit;
+    private String imageUrl;
 }

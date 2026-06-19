@@ -2,8 +2,14 @@ package com.comdao.api.user.exceptions;
 
 import com.comdao.api.base.RFCException;
 
+import java.util.Map;
+
 public class UserDisabledException extends RFCException {
     public UserDisabledException(String s) {
         super(s, null);
+    }
+
+    public UserDisabledException(String message, Map<String, Object> details) {
+        super(message, details);
     }
 }

@@ -18,8 +18,8 @@ public class UserExceptionAdvice implements BaseExceptionAdvice {
         return buildErrorResponse(request, e, HttpStatus.CONFLICT, "User Disabled", null);
     }
 
-    @ExceptionHandler(UserNotExistException.class)
-    public ResponseEntity<Map<String, Object>> handleUserNotExist(HttpServletRequest request, UserNotExistException e) {
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleUserNotExist(HttpServletRequest request, UserNotFoundException e) {
         return buildErrorResponse(request, e, HttpStatus.BAD_REQUEST, "User Unregistered", null);
     }
 

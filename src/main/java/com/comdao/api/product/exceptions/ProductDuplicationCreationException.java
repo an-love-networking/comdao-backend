@@ -9,7 +9,7 @@ public class ProductDuplicationCreationException extends RFCException {
         super(s, null);
     }
 
-    public ProductDuplicationCreationException(String message, Map<String, String> details) {
+    public ProductDuplicationCreationException(String message, Map<String, Object> details) {
         super(message, details);
     }
 }

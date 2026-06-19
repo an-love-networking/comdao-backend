@@ -26,4 +26,7 @@ public class UserSettings {
     Boolean includePromotion = true;
     Boolean useDarkMode = false;
     Boolean useTwoStepVerification = false;
+
+    @Version
+    private Long version;
 }

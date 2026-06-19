@@ -6,9 +6,9 @@ import java.util.Map;
 
 @Getter
 public class RFCException extends Exception {
-    Object details;
+    Map<String, Object> details;
 
-    public RFCException(String message, Map<String, String> details) {
+    public RFCException(String message, Map<String, Object> details) {
         super(message);
         this.details = details;
     }

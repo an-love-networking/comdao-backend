@@ -5,7 +5,7 @@ import com.comdao.api.base.RFCException;
 import java.util.HashMap;
 
 public class UpdateInfoCollisionException extends RFCException {
-    public UpdateInfoCollisionException(String s, HashMap<String, String> details) {
+    public UpdateInfoCollisionException(String s, HashMap<String, Object> details) {
         super(s, details);
     }
 }

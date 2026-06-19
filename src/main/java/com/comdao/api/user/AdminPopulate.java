@@ -29,6 +29,8 @@ public class AdminPopulate {
                                          UserSettingsRepository userSettingsRepository,
                                          PasswordEncoder passwordEncoder) {
         return args -> {
+            if (userRepository.existsByUsername(adminUsername))
+                return;
             User admin = new User();
             admin.setFullName(adminName);
             admin.setUsername(adminUsername);

@@ -1,20 +1,27 @@
 package com.comdao.api.category;
 
-import com.comdao.api.category.dto.AllCategoryResponseDto;
 import com.comdao.api.category.dto.CategoryCreationDto;
+import com.comdao.api.category.dto.CategoryIdLabelResponseDto;
 import com.comdao.api.category.dto.CategoryResponseDto;
 import com.comdao.api.category.dto.CategoryUpdateDto;
 import com.comdao.api.category.entities.Category;
-import com.comdao.api.category.exceptions.*;
+import com.comdao.api.category.exceptions.CategoryCreationViolationException;
+import com.comdao.api.category.exceptions.CategoryDisabledException;
+import com.comdao.api.category.exceptions.CategoryNotExistException;
+import com.comdao.api.category.exceptions.CategoryUpdateViolationException;
 import com.comdao.api.product.ProductMapper;
 import com.comdao.api.product.ProductRepository;
+import com.comdao.api.product.dto.ProductDto;
 import com.comdao.api.product.entities.Product;
+import com.comdao.api.product.exceptions.ProductNotExistException;
 import lombok.RequiredArgsConstructor;
 import net.gcardone.junidecode.Junidecode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,11 +34,12 @@ public class CategoryService {
     private final ProductMapper productMapper;
 
     @Transactional(readOnly = true)
-    public AllCategoryResponseDto getAllCategories() {
-        AllCategoryResponseDto categories = new AllCategoryResponseDto();
-        categories.setCategories(categoryRepository.findByRetrievableTrue());
-        return categories;
+    public List<CategoryIdLabelResponseDto> getAllCategories() {
+//        AllCategoryResponseDto categories = new AllCategoryResponseDto();
+//        categories.setCategories(categoryRepository.findByRetrievableTrue());
+        return categoryRepository.findByRetrievableTrue();
     }
+
 
     @Transactional(readOnly = true)
     public CategoryResponseDto getCategory(Long id) throws
@@ -43,64 +51,83 @@ public class CategoryService {
             throw new CategoryDisabledException("This category is disabled");
 
         CategoryResponseDto response = categoryMapper.toCategoryResponse(category);
-        response.setProducts(category.getProducts().stream().map(
-                product -> productMapper.convertToProductDto(product)
-        ).collect(Collectors.toSet()));
+        Set<ProductDto> products = new HashSet<>();
+        for (Product product : category.getProducts()) {
+            if (product.getRetrievable())
+                products.add(productMapper.convertToProductDto(product));
+        }
+        response.setProducts(products);
+
         return response;
     }
 
+
     @Transactional(readOnly = true)
     public Category getCategoryAdmin(Long id)
-            throws CategoryDisabledException, CategoryNotExistException {
+            throws CategoryNotExistException {
         Category category = categoryRepository.findById(id).orElseThrow(
                 () -> new CategoryNotExistException("You have not created this category yet")
         );
         return category;
     }
 
-    public void checkExists(Set<Product> products) throws CategoryProductNotExistException {
-        Set<String> duplicates = new HashSet<>();
-        products.forEach(
-                product -> {
-                    if (!productRepository.existsByIdAndLabel(product.getId(), product.getLabel()))
-                        duplicates.add(product.getLabel());
-                }
-        );
 
-        if (!duplicates.isEmpty())
-            throw new CategoryProductNotExistException(
-                    "You can not add unexisted products in the category",
-                    duplicates
-            );
+    @Transactional(readOnly = true)
+    public void checkExistBeforeCreate(Set<Long> productIds)
+            throws ProductNotExistException {
+        productIds = new HashSet<>(productIds);
+
+        List<Long> nonExistProduct = productIds.stream().filter(
+                productId -> !productRepository.existsById(productId)
+        ).toList();
+
+        System.out.println(productIds);
+        System.out.println(nonExistProduct);
+        System.out.println("-----------------------");
+        if (!nonExistProduct.isEmpty())
+            throw new ProductNotExistException("Product does not exist", Map.of("non_exists", nonExistProduct));
     }
 
+
     @Transactional
-    public void createCategory(CategoryCreationDto creation)
-            throws CategoryCreationViolationException, CategoryProductNotExistException {
+    public Category createCategory(CategoryCreationDto creation)
+            throws CategoryCreationViolationException, ProductNotExistException {
         if (categoryRepository.existsByLabel(creation.getLabel()))
             throw new CategoryCreationViolationException("Creating an already existed category");
 
-        checkExists(creation.getProducts());
+        checkExistBeforeCreate(creation.getProductIds());
+        System.out.println(creation.getProductIds());
+
+        Set<Product> products = creation.getProductIds().stream().map(
+                product -> productRepository.findById(product).get()
+        ).collect(Collectors.toSet());
 
         Category newCategory = categoryMapper.createCategory(creation);
+        newCategory.setProducts(products);
         newCategory.setNormalizeLabel(Junidecode.unidecode(creation.getLabel()));
 
-        categoryRepository.save(newCategory);
+        return categoryRepository.save(newCategory);
     }
+
 
     @Transactional
     public Category updateCategory(CategoryUpdateDto update)
-            throws CategoryProductNotExistException, CategoryUpdateViolationException {
+            throws CategoryUpdateViolationException, ProductNotExistException {
         Category category = categoryRepository.findByIdAndLabel(update.getId(), update.getLabel()).orElseThrow(
                 () -> new CategoryUpdateViolationException("This category has not been created yet")
         );
 
-        checkExists(update.getProducts());
+        checkExistBeforeCreate(update.getProductIds());
+        Set<Product> products = update.getProductIds().stream().map(
+                product -> productRepository.findById(product).get()
+        ).collect(Collectors.toSet());
 
         categoryMapper.updateCategory(update, category);
+        category.setProducts(products);
         category.setNormalizeLabel(Junidecode.unidecode(update.getLabel()));
         return categoryRepository.save(category);
     }
+
 
     @Transactional
     public void disableCategory(Long id) throws CategoryNotExistException {
@@ -108,6 +135,7 @@ public class CategoryService {
                 () -> new CategoryNotExistException("This category has not been created yet"));
         category.setRetrievable(false);
     }
+
 
     @Transactional
     public void enableCategory(Long id) throws CategoryNotExistException {

@@ -5,7 +5,7 @@ import com.comdao.api.base.RFCException;
 import java.util.Map;
 
 public class CategoryDisabledException extends RFCException {
-    public CategoryDisabledException(String message, Map<String, String> details) {
+    public CategoryDisabledException(String message, Map<String, Object> details) {
         super(message, details);
     }
 

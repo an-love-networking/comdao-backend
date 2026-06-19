@@ -3,6 +3,7 @@ package com.comdao.api.category.entities;
 import com.comdao.api.product.entities.Product;
 import com.comdao.api.product.entities.enums.Badge;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +22,8 @@ import java.util.Set;
 @ToString(onlyExplicitlyIncluded = true)
 public class Category {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_seq_gen")
+    @SequenceGenerator(name = "category_seq_gen", allocationSize = 1, sequenceName = "category_seq")
     private Long id;
     @ToString.Include
     private String label;
@@ -30,19 +32,24 @@ public class Category {
 
     @Enumerated(value = EnumType.STRING)
     private Badge badge;
+    @JsonIgnore
     private String normalizeLabel;
 
     @JsonFormat(pattern = "dd-MM-yyyy")
     private LocalDate created = LocalDate.now();
     private Boolean retrievable = true;
 
-    @ManyToMany(cascade = {CascadeType.MERGE})
+    @ManyToMany
     @JoinTable(
             name = "category_products",
             joinColumns = @JoinColumn(name = "category_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private Set<Product> products = new HashSet<>();
+
+    @Version
+    @JsonIgnore
+    private Long version;
 
     public void addProduct(Product product) {
         this.products.add(product);

@@ -1,7 +1,10 @@
 package com.comdao.api.category;
 
 import com.comdao.api.base.BaseExceptionAdvice;
-import com.comdao.api.category.exceptions.*;
+import com.comdao.api.category.exceptions.CategoryCreationViolationException;
+import com.comdao.api.category.exceptions.CategoryDisabledException;
+import com.comdao.api.category.exceptions.CategoryNotExistException;
+import com.comdao.api.category.exceptions.CategoryUpdateViolationException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,14 +37,6 @@ public class CategoryExceptionAdvice implements BaseExceptionAdvice {
             CategoryNotExistException e
     ) {
         return buildErrorResponse(request, e, HttpStatus.BAD_REQUEST, "Category non exist", null);
-    }
-
-    @ExceptionHandler(CategoryProductNotExistException.class)
-    public ResponseEntity<Map<String, Object>> handleCategoryProductNotExistExceptionGoneWrong(
-            HttpServletRequest request,
-            CategoryProductNotExistException e
-    ) {
-        return buildErrorResponse(request, e, HttpStatus.BAD_REQUEST, "Product non exist", e.getDuplicates());
     }
 
     @ExceptionHandler(CategoryUpdateViolationException.class)

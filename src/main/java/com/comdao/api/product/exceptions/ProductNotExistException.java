@@ -9,7 +9,7 @@ public class ProductNotExistException extends RFCException {
         super(s, null);
     }
 
-    public ProductNotExistException(String message, Map<String, String> details) {
+    public ProductNotExistException(String message, Map<String, Object> details) {
         super(message, details);
     }
 }
